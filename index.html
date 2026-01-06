@@ -1,112 +1,82 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>WiFi Miễn Phí</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Connect WiFi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Tránh cache captive portal -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f9fafb;
       text-align: center;
-      padding: 48px 16px;
-    }
-    h2 {
-      color: #111827;
-      margin-bottom: 8px;
-    }
-    p {
-      color: #374151;
-      margin-bottom: 24px;
+      padding-top: 60px;
     }
     button {
-      font-size: 16px;
-      padding: 14px 28px;
+      font-size: 18px;
+      padding: 16px 32px;
       background: #2563eb;
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
     }
     button:disabled {
-      background: #94a3b8;
-      cursor: not-allowed;
-    }
-    .error {
-      color: #b91c1c;
-      font-weight: bold;
-      margin-top: 24px;
-    }
-    .info {
-      font-size: 13px;
-      color: #6b7280;
-      margin-top: 16px;
+      background: #9ca3af;
     }
   </style>
 </head>
-
 <body>
+
   <h2>WiFi Miễn Phí</h2>
-  <p>Nhấn nút bên dưới để truy cập Internet</p>
+  <p>Bấm nút bên dưới để vào Internet</p>
 
-  <button id="connectBtn" disabled>Đang kết nối...</button>
-
-  <div id="error" class="error" style="display:none;">
-    Không tìm thấy thông tin kết nối từ Omada Controller.
-  </div>
-
-  <div class="info" id="ssidInfo"></div>
+  <button id="btn" disabled>Đang tải...</button>
 
 <script>
 (function () {
-  const params = new URLSearchParams(window.location.search);
+  const qs = new URLSearchParams(window.location.search);
 
-  const clientMac   = params.get("clientMac");
-  const apMac       = params.get("apMac");
-  const t           = params.get("t");
-  const site        = params.get("site");
-  const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
-  const ssidName    = params.get("ssidName");
+  const clientMac = qs.get("clientMac");
+  const apMac     = qs.get("apMac");
+  const t         = qs.get("t");
+  const site      = qs.get("site");
 
-  const btn = document.getElementById("connectBtn");
-  const errorBox = document.getElementById("error");
-  const ssidInfo = document.getElementById("ssidInfo");
+  const btn = document.getElementById("btn");
 
-  if (ssidName) {
-    ssidInfo.textContent = `SSID: ${decodeURIComponent(ssidName.replace(/\+/g, " "))}`;
-  }
-
-  // Kiểm tra portal context hợp lệ
   if (!clientMac || !apMac || !t || !site) {
-    btn.style.display = "none";
-    errorBox.style.display = "block";
+    btn.textContent = "Thiếu tham số portal";
     return;
   }
 
   btn.disabled = false;
   btn.textContent = "Kết nối WiFi";
 
-  btn.addEventListener("click", function () {
+  let clicked = false;
+
+  btn.onclick = function () {
+    if (clicked) return;
+    clicked = true;
+
     btn.disabled = true;
-    btn.textContent = "Đang xác thực...";
+    btn.textContent = "Đang kết nối...";
 
     const authorizeUrl =
       "https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize" +
-      `?clientMac=${encodeURIComponent(clientMac)}` +
-      `&apMac=${encodeURIComponent(apMac)}` +
-      `&t=${encodeURIComponent(t)}` +
-      `&site=${encodeURIComponent(site)}`;
+      "?clientMac=" + encodeURIComponent(clientMac) +
+      "&apMac=" + encodeURIComponent(apMac) +
+      "&t=" + encodeURIComponent(t) +
+      "&site=" + encodeURIComponent(site);
 
-    // Redirect chuẩn captive portal
     window.location.href = authorizeUrl;
-  });
+  };
 })();
 </script>
+
 </body>
 </html>
