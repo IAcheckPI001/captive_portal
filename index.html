@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>WiFi Free</title>
+  <title>WiFi Miễn Phí</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
@@ -13,39 +13,35 @@
 <script>
 const params = new URLSearchParams(location.search);
 
-const portalCtx = {
-  clientMac: params.get("clientMac"),
-  apMac: params.get("apMac"),
-  site: params.get("site"),
-  redirectUrl: params.get("redirectUrl") || "https://www.google.com"
-};
+const clientMac = params.get("clientMac");
+const apMac     = params.get("apMac");
+const site      = params.get("site");
+const t         = params.get("t");
+const redirect  = params.get("redirectUrl") || "https://www.google.com";
 
 const btn = document.getElementById("btn");
 
-if (!portalCtx.clientMac || !portalCtx.apMac || !portalCtx.site) {
+if (!clientMac || !apMac || !site || !t) {
   btn.innerText = "Thiếu thông tin Portal";
 } else {
   btn.disabled = false;
   btn.innerText = "Kết nối Internet";
 }
 
-btn.onclick = async () => {
+btn.onclick = () => {
   btn.disabled = true;
   btn.innerText = "Đang xác thực...";
 
-  const res = await fetch("/api/authorize", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(portalCtx)
-  });
+  const authorizeUrl =
+    "http://172.31.176.1/portal/api/authorize" +
+    "?clientMac=" + encodeURIComponent(clientMac) +
+    "&apMac=" + encodeURIComponent(apMac) +
+    "&site=" + encodeURIComponent(site) +
+    "&t=" + encodeURIComponent(t) +
+    "&redirectUrl=" + encodeURIComponent(redirect);
 
-  const data = await res.json();
-  if (data.success) {
-    location.href = portalCtx.redirectUrl;
-  } else {
-    alert("Authorize thất bại");
-    btn.disabled = false;
-  }
+  // BẮT BUỘC redirect trình duyệt
+  location.href = authorizeUrl;
 };
 </script>
 </body>
