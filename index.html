@@ -1,82 +1,52 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Connect WiFi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Tránh cache captive portal -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f9fafb;
-      text-align: center;
-      padding-top: 60px;
-    }
-    button {
-      font-size: 18px;
-      padding: 16px 32px;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #9ca3af;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>WiFi Free</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-
   <h2>WiFi Miễn Phí</h2>
-  <p>Bấm nút bên dưới để vào Internet</p>
-
+  <p>Nhấn để truy cập Internet</p>
   <button id="btn" disabled>Đang tải...</button>
 
 <script>
-(function () {
-  const qs = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 
-  const clientMac = qs.get("clientMac");
-  const apMac     = qs.get("apMac");
-  const t         = qs.get("t");
-  const site      = qs.get("site");
+const portalCtx = {
+  clientMac: params.get("clientMac"),
+  apMac: params.get("apMac"),
+  site: params.get("site"),
+  redirectUrl: params.get("redirectUrl") || "https://www.google.com"
+};
 
-  const btn = document.getElementById("btn");
+const btn = document.getElementById("btn");
 
-  if (!clientMac || !apMac || !t || !site) {
-    btn.textContent = "Thiếu tham số portal";
-    return;
-  }
-
+if (!portalCtx.clientMac || !portalCtx.apMac || !portalCtx.site) {
+  btn.innerText = "Thiếu thông tin Portal";
+} else {
   btn.disabled = false;
-  btn.textContent = "Kết nối WiFi";
+  btn.innerText = "Kết nối Internet";
+}
 
-  let clicked = false;
+btn.onclick = async () => {
+  btn.disabled = true;
+  btn.innerText = "Đang xác thực...";
 
-  btn.onclick = function () {
-    if (clicked) return;
-    clicked = true;
+  const res = await fetch("/api/authorize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(portalCtx)
+  });
 
-    btn.disabled = true;
-    btn.textContent = "Đang kết nối...";
-
-    const authorizeUrl =
-      "https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize" +
-      "?clientMac=" + encodeURIComponent(clientMac) +
-      "&apMac=" + encodeURIComponent(apMac) +
-      "&t=" + encodeURIComponent(t) +
-      "&site=" + encodeURIComponent(site);
-
-    window.location.href = authorizeUrl;
-  };
-})();
+  const data = await res.json();
+  if (data.success) {
+    location.href = portalCtx.redirectUrl;
+  } else {
+    alert("Authorize thất bại");
+    btn.disabled = false;
+  }
+};
 </script>
-
 </body>
 </html>
