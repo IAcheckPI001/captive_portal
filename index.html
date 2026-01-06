@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   connectBtn.addEventListener("click", () => {
     // Redirect trực tiếp, không dùng popup
     const authorizeUrl = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
-
+    console.log(authorizeUrl);
     window.location.href = authorizeUrl;
   });
 });
