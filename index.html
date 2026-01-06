@@ -1,70 +1,113 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>WiFi Miễn Phí - Test Portal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 50px;
-    background: #f5f7fa;
-  }
-  h2 { color: #111827; }
-  p { font-size: 16px; color: #374151; }
-  input {
-    padding: 8px;
-    width: 250px;
-    margin: 5px;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-  }
-  button {
-    font-size: 16px;
-    padding: 12px 24px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>WiFi Miễn Phí</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tránh cache captive portal -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      text-align: center;
+      padding: 48px 16px;
+    }
+    h2 {
+      color: #111827;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #374151;
+      margin-bottom: 24px;
+    }
+    button {
+      font-size: 16px;
+      padding: 14px 28px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .error {
+      color: #b91c1c;
+      font-weight: bold;
+      margin-top: 24px;
+    }
+    .info {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 16px;
+    }
+  </style>
 </head>
+
 <body>
-<h2>WiFi Miễn Phí - Test Portal</h2>
-<p>Nhập thông tin giả lập để test redirect</p>
+  <h2>WiFi Miễn Phí</h2>
+  <p>Nhấn nút bên dưới để truy cập Internet</p>
 
-<div>
-  <input id="clientMac" placeholder="Client MAC" value="7C-70-DB-E4-B1-D7"><br>
-  <input id="apMac" placeholder="AP MAC" value="10-5A-95-9F-95-4C"><br>
-  <input id="t" placeholder="t" value="1767670587"><br>
-  <input id="site" placeholder="site" value="ffff16948a3a832bf7b1478329ff9"><br>
-  <input id="redirectUrl" placeholder="Redirect URL" value="https://phuongminhphung.myportal.vn/"><br>
-</div>
+  <button id="connectBtn" disabled>Đang kết nối...</button>
 
-<button id="connectBtn">Kết nối WiFi (Test)</button>
+  <div id="error" class="error" style="display:none;">
+    Không tìm thấy thông tin kết nối từ Omada Controller.
+  </div>
+
+  <div class="info" id="ssidInfo"></div>
 
 <script>
-document.getElementById("connectBtn").addEventListener("click", () => {
-  const clientMac = document.getElementById("clientMac").value.trim();
-  const apMac = document.getElementById("apMac").value.trim();
-  const t = document.getElementById("t").value.trim();
-  const site = document.getElementById("site").value.trim();
-  const redirectUrl = document.getElementById("redirectUrl").value.trim();
+(function () {
+  const params = new URLSearchParams(window.location.search);
 
+  const clientMac   = params.get("clientMac");
+  const apMac       = params.get("apMac");
+  const t           = params.get("t");
+  const site        = params.get("site");
+  const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
+  const ssidName    = params.get("ssidName");
+
+  const btn = document.getElementById("connectBtn");
+  const errorBox = document.getElementById("error");
+  const ssidInfo = document.getElementById("ssidInfo");
+
+  if (ssidName) {
+    ssidInfo.textContent = `SSID: ${decodeURIComponent(ssidName.replace(/\+/g, " "))}`;
+  }
+
+  // Kiểm tra portal context hợp lệ
   if (!clientMac || !apMac || !t || !site) {
-    alert("Vui lòng nhập đầy đủ thông tin giả lập.");
+    btn.style.display = "none";
+    errorBox.style.display = "block";
     return;
   }
 
-  const authorizeUrl = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+  btn.disabled = false;
+  btn.textContent = "Kết nối WiFi";
 
-  // Thay vì redirect thật, in ra console và hiển thị alert
-  console.log("Authorize URL:", authorizeUrl);
-  alert("URL authorize (giả lập) được tạo, check console để xem.\nKhông gửi request thực sự để tránh lỗi 404.");
-});
+  btn.addEventListener("click", function () {
+    btn.disabled = true;
+    btn.textContent = "Đang xác thực...";
+
+    const authorizeUrl =
+      "https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize" +
+      `?clientMac=${encodeURIComponent(clientMac)}` +
+      `&apMac=${encodeURIComponent(apMac)}` +
+      `&t=${encodeURIComponent(t)}` +
+      `&site=${encodeURIComponent(site)}` +
+      `&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+
+    // Redirect chuẩn captive portal
+    window.location.href = authorizeUrl;
+  });
+})();
 </script>
 </body>
 </html>
