@@ -1,75 +1,53 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>WiFi Miễn Phí</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="cache-control" content="no-cache" />
-  <meta http-equiv="pragma" content="no-cache" />
-  <meta http-equiv="expires" content="0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chào mừng</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
     }
     button {
-      padding: 12px 24px;
-      font-size: 16px;
+      padding: 15px 25px;
+      font-size: 18px;
+      background-color: #0068ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    button:hover {
+      background-color: #0050cc;
+    }
+    p {
+      margin-top: 15px;
+      color: #666;
     }
   </style>
 </head>
-
 <body>
-  <h2>WiFi Miễn Phí</h2>
-  <p>Nhấn nút bên dưới để truy cập Internet</p>
-
-  <button id="btn" disabled>Đang tải...</button>
+  <h1>Chào mừng bạn!</h1>
+  <button id="openZalo">Mở Zalo</button>
+  <p>Nhấn nút trên để mở link Zalo.</p>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-
-    const clientMac = params.get("clientMac");
-    const apMac     = params.get("apMac");
-    const site      = params.get("site");
-    const t         = params.get("t");
-    const redirect  = params.get("redirectUrl"); // KHÔNG set default
-
-    const btn = document.getElementById("btn");
-
-    if (!clientMac || !apMac || !site || !t) {
-      btn.innerText = "Thiếu thông tin Portal";
-      console.error("Missing portal params", {
-        clientMac, apMac, site, t, redirect
-      });
-    } else {
-      btn.disabled = false;
-      btn.innerText = "Kết nối Internet";
-    }
-
-    btn.onclick = function () {
-      btn.disabled = true;
-      btn.innerText = "Đang xác thực...";
-
-      let authorizeUrl =
-        "http://172.31.176.1/portal/api/authorize" +
-        "?clientMac=" + encodeURIComponent(clientMac) +
-        "&apMac=" + encodeURIComponent(apMac) +
-        "&site=" + encodeURIComponent(site) +
-        "&t=" + encodeURIComponent(t);
-
-      if (redirect) {
-        authorizeUrl += "&redirectUrl=" + encodeURIComponent(redirect);
-      }
-
-      // BẮT BUỘC redirect trình duyệt
-      window.location.href = authorizeUrl;
-    };
+    const button = document.getElementById('openZalo');
+    button.addEventListener('click', () => {
+      // Đây là deep link Zalo
+      window.location.href = 'https://zalo.me/s/745839231028697461';
+    });
   </script>
 </body>
 </html>
