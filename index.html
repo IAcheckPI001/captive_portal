@@ -2,39 +2,65 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>WiFi miễn phí</title>
+<title>WiFi Miễn Phí</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body { font-family: Arial; text-align:center; padding:50px; background:#f5f7fa; }
-  button { font-size:16px; padding:12px 20px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; }
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 50px;
+    background: #f5f7fa;
+  }
+  h2 { color: #111827; }
+  p { font-size: 16px; color: #374151; }
+  button {
+    font-size: 16px;
+    padding: 14px 24px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
-<h2>WiFi miễn phí</h2>
-<p>Nhấn nút để truy cập Internet</p>
-<button id="connectBtn">Kết nối WiFi</button>
+<h2>WiFi Miễn Phí</h2>
+<p>Nhấn nút bên dưới để kết nối Internet</p>
+<button id="connectBtn" disabled>Đang tải...</button>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
+
+  // Lấy param từ Omada
   const clientMac = params.get("clientMac");
   const apMac = params.get("apMac");
   const t = params.get("t");
   const site = params.get("site");
   const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
 
+  const connectBtn = document.getElementById("connectBtn");
+
   if (!clientMac || !apMac || !t || !site) {
-    document.body.innerHTML = "<h3>Invalid portal request</h3>";
-    return; // Dừng script để không gọi button nữa
+    document.body.innerHTML = "<h3>Yêu cầu portal không hợp lệ</h3>";
+    return;
   }
 
-  const connectBtn = document.getElementById("connectBtn");
-  if (connectBtn) {
-    connectBtn.addEventListener("click", () => {
-      const url = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
-      window.open(url, "_self"); // tương thích iOS/Android
-    });
-  }
+  // Enable button khi đã có param
+  connectBtn.disabled = false;
+
+  connectBtn.addEventListener("click", () => {
+    // Redirect trực tiếp, không dùng popup
+    const authorizeUrl = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+
+    window.location.href = authorizeUrl;
+  });
 });
 </script>
 </body>
