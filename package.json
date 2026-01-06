@@ -1,6 +1,0 @@
-{
-  "name": "omada-portal",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
-}

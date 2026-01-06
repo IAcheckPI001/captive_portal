@@ -4,45 +4,72 @@
   <meta charset="UTF-8" />
   <title>WiFi Miễn Phí</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="expires" content="0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 16px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
+
 <body>
   <h2>WiFi Miễn Phí</h2>
-  <p>Nhấn để truy cập Internet</p>
+  <p>Nhấn nút bên dưới để truy cập Internet</p>
+
   <button id="btn" disabled>Đang tải...</button>
 
-<script>
-const params = new URLSearchParams(location.search);
+  <script>
+    const params = new URLSearchParams(window.location.search);
 
-const clientMac = params.get("clientMac");
-const apMac     = params.get("apMac");
-const site      = params.get("site");
-const t         = params.get("t");
-const redirect  = params.get("redirectUrl") || "https://www.google.com";
+    const clientMac = params.get("clientMac");
+    const apMac     = params.get("apMac");
+    const site      = params.get("site");
+    const t         = params.get("t");
+    const redirect  = params.get("redirectUrl"); // KHÔNG set default
 
-const btn = document.getElementById("btn");
+    const btn = document.getElementById("btn");
 
-if (!clientMac || !apMac || !site || !t) {
-  btn.innerText = "Thiếu thông tin Portal";
-} else {
-  btn.disabled = false;
-  btn.innerText = "Kết nối Internet";
-}
+    if (!clientMac || !apMac || !site || !t) {
+      btn.innerText = "Thiếu thông tin Portal";
+      console.error("Missing portal params", {
+        clientMac, apMac, site, t, redirect
+      });
+    } else {
+      btn.disabled = false;
+      btn.innerText = "Kết nối Internet";
+    }
 
-btn.onclick = () => {
-  btn.disabled = true;
-  btn.innerText = "Đang xác thực...";
+    btn.onclick = function () {
+      btn.disabled = true;
+      btn.innerText = "Đang xác thực...";
 
-  const authorizeUrl =
-    "http://172.31.176.1/portal/api/authorize" +
-    "?clientMac=" + encodeURIComponent(clientMac) +
-    "&apMac=" + encodeURIComponent(apMac) +
-    "&site=" + encodeURIComponent(site) +
-    "&t=" + encodeURIComponent(t) +
-    "&redirectUrl=" + encodeURIComponent(redirect);
+      let authorizeUrl =
+        "http://172.31.176.1/portal/api/authorize" +
+        "?clientMac=" + encodeURIComponent(clientMac) +
+        "&apMac=" + encodeURIComponent(apMac) +
+        "&site=" + encodeURIComponent(site) +
+        "&t=" + encodeURIComponent(t);
 
-  // BẮT BUỘC redirect trình duyệt
-  location.href = authorizeUrl;
-};
-</script>
+      if (redirect) {
+        authorizeUrl += "&redirectUrl=" + encodeURIComponent(redirect);
+      }
+
+      // BẮT BUỘC redirect trình duyệt
+      window.location.href = authorizeUrl;
+    };
+  </script>
 </body>
 </html>
