@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -17,20 +15,26 @@
 <button id="connectBtn">Kết nối WiFi</button>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const clientMac = params.get("clientMac");
-const apMac = params.get("apMac");
-const t = params.get("t");
-const site = params.get("site");
-const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const clientMac = params.get("clientMac");
+  const apMac = params.get("apMac");
+  const t = params.get("t");
+  const site = params.get("site");
+  const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
 
-if (!clientMac || !apMac || !t || !site) {
-  document.body.innerHTML = "Invalid portal request";
-}
+  if (!clientMac || !apMac || !t || !site) {
+    document.body.innerHTML = "<h3>Invalid portal request</h3>";
+    return; // Dừng script để không gọi button nữa
+  }
 
-document.getElementById("connectBtn").addEventListener("click", () => {
-  const url = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
-  window.open(url, "_self"); // tương thích iOS/Android
+  const connectBtn = document.getElementById("connectBtn");
+  if (connectBtn) {
+    connectBtn.addEventListener("click", () => {
+      const url = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+      window.open(url, "_self"); // tương thích iOS/Android
+    });
+  }
 });
 </script>
 </body>
