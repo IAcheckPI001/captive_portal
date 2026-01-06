@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>WiFi Miễn Phí</title>
+<title>WiFi Miễn Phí - Test Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
@@ -13,9 +13,16 @@
   }
   h2 { color: #111827; }
   p { font-size: 16px; color: #374151; }
+  input {
+    padding: 8px;
+    width: 250px;
+    margin: 5px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+  }
   button {
     font-size: 16px;
-    padding: 14px 24px;
+    padding: 12px 24px;
     background: #2563eb;
     color: white;
     border: none;
@@ -23,44 +30,40 @@
     cursor: pointer;
     margin-top: 20px;
   }
-  button:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-  }
 </style>
 </head>
 <body>
-<h2>WiFi Miễn Phí</h2>
-<p>Nhấn nút bên dưới để kết nối Internet</p>
-<button id="connectBtn" disabled>Đang tải...</button>
+<h2>WiFi Miễn Phí - Test Portal</h2>
+<p>Nhập thông tin giả lập để test redirect</p>
+
+<div>
+  <input id="clientMac" placeholder="Client MAC" value="7C-70-DB-E4-B1-D7"><br>
+  <input id="apMac" placeholder="AP MAC" value="10-5A-95-9F-95-4C"><br>
+  <input id="t" placeholder="t" value="1767670587"><br>
+  <input id="site" placeholder="site" value="ffff16948a3a832bf7b1478329ff9"><br>
+  <input id="redirectUrl" placeholder="Redirect URL" value="https://phuongminhphung.myportal.vn/"><br>
+</div>
+
+<button id="connectBtn">Kết nối WiFi (Test)</button>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-
-  // Lấy param từ Omada
-  const clientMac = params.get("clientMac");
-  const apMac = params.get("apMac");
-  const t = params.get("t");
-  const site = params.get("site");
-  const redirectUrl = params.get("redirectUrl") || "https://phuongminhphung.myportal.vn/";
-
-  const connectBtn = document.getElementById("connectBtn");
+document.getElementById("connectBtn").addEventListener("click", () => {
+  const clientMac = document.getElementById("clientMac").value.trim();
+  const apMac = document.getElementById("apMac").value.trim();
+  const t = document.getElementById("t").value.trim();
+  const site = document.getElementById("site").value.trim();
+  const redirectUrl = document.getElementById("redirectUrl").value.trim();
 
   if (!clientMac || !apMac || !t || !site) {
-    document.body.innerHTML = "<h3>Yêu cầu portal không hợp lệ</h3>";
+    alert("Vui lòng nhập đầy đủ thông tin giả lập.");
     return;
   }
 
-  // Enable button khi đã có param
-  connectBtn.disabled = false;
+  const authorizeUrl = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
-  connectBtn.addEventListener("click", () => {
-    // Redirect trực tiếp, không dùng popup
-    const authorizeUrl = `https://aps1-omada-essential-controller.tplinkcloud.com/app/authorize?clientMac=${encodeURIComponent(clientMac)}&apMac=${encodeURIComponent(apMac)}&t=${encodeURIComponent(t)}&site=${encodeURIComponent(site)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
-    console.log(authorizeUrl);
-    window.location.href = authorizeUrl;
-  });
+  // Thay vì redirect thật, in ra console và hiển thị alert
+  console.log("Authorize URL:", authorizeUrl);
+  alert("URL authorize (giả lập) được tạo, check console để xem.\nKhông gửi request thực sự để tránh lỗi 404.");
 });
 </script>
 </body>
